@@ -41,7 +41,7 @@ titanic %>%
 
 Split the data, stratifying on the outcome variable, `survived.`  You should choose the proportions to split the data into. Verify that the training and testing data sets have the appropriate number of observations. Take a look at the training data and note any potential issues, such as missing data.
 
-The training and testing data sets seem to have the appropriate number of observations. First of all we have a lot of missing data in our dataset especially for the cabin section which I personally think is very important for our analysis, secondly in the ticket section the records are in combination of characters and numbers and that can be hard to analyze. 
+The training and testing data sets seem to have the appropriate number of observations. First of all we have a lot of missing data in our dataset especially for the cabin and age section which I personally think are very important for our analysis, secondly in the ticket section the records are in combination of characters and numbers and that can be hard to analyze. We also have variables that are likely to correlate to each other.  
 
 
 Why is it a good idea to use stratified sampling for this data?
@@ -51,7 +51,7 @@ It is a good idea to use stratified sampling for this data because we have a var
 ```{r}
 set.seed(1010)
 
-titanic_split <- initial_split(titanic, prop = 0.50,
+titanic_split <- initial_split(titanic, prop = 0.70,
                                 strata = survived)
 
 titanic_train <- training(titanic_split)
@@ -196,15 +196,19 @@ Use `predict()` and `bind_cols()` to generate predictions using each of these 4 
 
 Which model achieved the highest accuracy on the training data? 
 
-According to our results so far, it looks like the logistic regression model has the highest accuracy on the training data with an accuracy thats roughly 81.2%.
+According to our results so far, it looks like the logistic regression model has the highest accuracy on the training data with an accuracy thats roughly 83.14607	%.
 
 
 ```{r}
-predict(log_fit, new_data = titanic_train, type = "prob")
-predict(lda_fit, new_data = titanic_train, type = "prob")
-predict(qda_fit, new_data = titanic_train, type = "prob")
-predict(nb_fit, new_data = titanic_train, type = "prob")
-
+log_fit_pred <- predict(log_fit, new_data = titanic_train, type = "prob")
+lda_fit_pred <- predict(lda_fit, new_data = titanic_train, type = "prob")
+qda_fit_pred <- predict(qda_fit, new_data = titanic_train, type = "prob")
+nb_fit_pred <- predict(nb_fit, new_data = titanic_train, type = "prob")
+```
+```{r}
+bind_cols(log_fit_pred, lda_fit_pred, qda_fit_pred, nb_fit_pred) 
+```
+```{r}
 log_reg_acc <- augment(log_fit, new_data = titanic_train) %>%
   accuracy(truth = survived, estimate = .pred_class)
 lda_acc <- augment(lda_fit, new_data = titanic_train) %>%
@@ -245,7 +249,7 @@ Again using the **testing** data, create a confusion matrix and visualize it. Pl
 
 How did the model perform? Compare its training and testing accuracies. If the values differ, why do you think this is so?
 
-The model did pretty well, the model worked better on the training data than the training data which are 0.8157303 to 0.8004484. They are pretty close. I think the reason why the accuracy is higher for the training data than the test data maybe because of over fitting. And we should get higher accuracy on the training data anyway. 
+The model did pretty well, the model worked better on the training data than the test data which are 83.14607% to 79.10448%. They are pretty close. I think the reason why the accuracy is higher for the training data than the test data maybe because of over fitting. We had more data to work with in the training set. And that is okay, we should get higher accuracy on the training data anyway. 
 
 
 ```{r}
